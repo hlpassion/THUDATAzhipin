@@ -21,37 +21,39 @@ class ThudatazhipinPipeline(object):
         date = item['posted_date'][0]
         if date == date1:
             final_date = '{}/{}/{}'.format(time.localtime().tm_year, time.localtime().tm_mon, time.localtime().tm_mday - 1)
-        elif re.findall(':', date) == ':':
+        elif len(re.findall(':', date)) != 0:
             final_date = '{}/{}/{}'.format(time.localtime().tm_year, time.localtime().tm_mon, time.localtime().tm_mday)
         else:
             month = re.findall("[0-9][0-9]", date)[0]
             day = re.findall("[0-9][0-9]", date)[1]
             final_date = '{}/{}/{}'.format(time.localtime().tm_year, month, day)
+
         item['posted_date'] = final_date
-        return item
         # ---------------结果写入CSV文件--------------
-        # crawl_time = time.strftime("%Y_%m_%d", time.localtime())
-        # with open('THUDataPiCrawler_zhipin' + '_' + crawl_time + '.csv', 'a') as f:
-        #     writer = csv.writer(f, dialect='excel')
-        #     writer.writerow(
-        #             item['job_position'],
-        #             item['job_tag'],
-        #             item['department_name'],
-        #             item['job_location'],
-        #             item['job_attribute'],
-        #             item['experience'],
-        #             item['job_salary'],
-        #             item['professional_requirement'],
-        #             item['recruiting_num'],
-        #             item['position_temptation'],
-        #             item['position_desc'],
-        #             item['company_name'],
-        #             item['company_industry'],
-        #             item['company_attribute'],
-        #             item['financing_stage'],
-        #             item['company_scale'],
-        #             item['company_page'],
-        #             final_date,
-        #             item['posted_url'],
-        #             item['original_link']
-        #     )
+        crawl_time = time.strftime("%Y_%m_%d", time.localtime())
+        with open('THUDataPiCrawler_zhipin' + '_' + crawl_time + '.csv', 'a') as f:
+            writer = csv.writer(f, dialect='excel')
+            writer.writerow(
+                [
+                    item['job_position'],
+                    item['job_tag'],
+                    item['department_name'],
+                    item['job_location'],
+                    item['job_attribute'],
+                    item['experience'],
+                    item['job_salary'],
+                    item['professional_requirement'],
+                    item['recruiting_num'],
+                    item['position_temptation'],
+                    item['position_desc'],
+                    item['company_name'],
+                    item['company_industry'],
+                    item['company_attribute'],
+                    item['financing_stage'],
+                    item['company_scale'],
+                    item['company_page'],
+                    final_date,
+                    item['posted_url'],
+                    item['original_link']
+                ]
+            )
