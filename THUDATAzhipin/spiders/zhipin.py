@@ -64,13 +64,10 @@ class ZhipinSpider(scrapy.Spider):
             item['financing_stage'] = 'NULL'
             item['company_scale'] = job_info.xpath('div[@class="info-comapny"]/p[2]/text()[2]').extract()
 
-
         item['company_page'] = 'NULL'
         item['posted_date'] = sel.xpath('//div[@class="job-author"]/span/text()').extract()
         item['posted_url'] = 'BOSS直聘'
         item['original_link'] = response.url
-
-
 
         yield item
 
