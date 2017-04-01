@@ -6,8 +6,24 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import random
 
 
+# 这个类主要用于产生随机UserAgent
+class RandomUserAgent(object):
+    def __init__(self, agents):
+        self.agents = agents
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings.getlist('USER_AGENTS'))  # 返回的是本类的实例cls ==RandomUserAgent
+
+    def process_request(self, request, spider):
+        # print(random.choice(self.agents))
+        request.headers.setdefault('User-Agent', random.choice(self.agents))
+
+
+"""
 class ThudatazhipinSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -54,3 +70,4 @@ class ThudatazhipinSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+"""
