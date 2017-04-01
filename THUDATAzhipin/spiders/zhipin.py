@@ -3,13 +3,37 @@ import scrapy
 from scrapy.selector import Selector
 import re
 from ..items import ThudatazhipinItem
+import time
 
 
 class ZhipinSpider(scrapy.Spider):
     name = "zhipin"
     allowed_domains = ["zhipin.com"]
-    start_urls = ['https://www.zhipin.com/c101010100/h_101010100/?'
-                  'query=%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90&page=1&ka=page-1']
+    # start_urls = ['https://www.zhipin.com/c101010100/h_101010100/?'
+    #               'query=%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90&page=1&ka=page-1']
+
+    def start_requests(self):
+        search_fields = ['hadoop', 'spark', 'hbase', 'hive', 'Hadoop', 'Spark', 'Hbase', 'Hive', 'HADOOP', r'大数据',
+                         r'数据分析', r'数据运营', r'数据挖掘', r'爬虫', r'抓取', r'可视化', r'数据开发', r'数据工程',
+                         r'数据处理', r'数据科学家', r'数据工程师', r'数据架构师', r'数据采集', r'数据建模', r'数据平台',
+                         r'数据研发', r'数据管理', r'数据统计', r'数据产品', r'数据方向', r'数据仓库', r'数据研究',
+                         r'数据算法', r'数据蜘蛛', r'数据应用', r'数据技术', r'数据运维', r'数据支撑', r'数据安全',
+                         r'数据爬取', r'数据经理', r'金融数据', r'数据专员', r'数据主管', r'数据项目经理', r'数据整合',
+                         r'数据模型', r'财务数据', r'数据专家', r'数据报送', r'数据中心', r'数据移动', r'数据标准',
+                         r'数据推广', r'数据质量', r'数据检索', r'数据服务', r'数据搭建', r'数据实施', r'数据风控']
+
+        # 城市 北京|上海|广州|深圳|杭州|天津|西安|苏州|武汉|厦门|长沙|成都|重庆|哈尔滨|沈阳
+        city_list = ['101010100', '101020100', '101280100', '101280600', '101210100', '101030100', '101110100',
+                     '101190400', '101200100', '101230200', '101250100', '101270100', '101040100', '101050100', '101070100']
+
+        urls = []
+        for city in city_list:
+            for job in search_fields:
+                url = 'https://www.zhipin.com/c%s/?query=%s' % (city, job)
+                urls.append(url)
+        for job_url in urls:
+            time.sleep(2)
+            yield scrapy.Request(url=job_url, callback=self.parse)
 
     def parse(self, response):
         sel = Selector(response)
@@ -17,7 +41,14 @@ class ZhipinSpider(scrapy.Spider):
         job_urls = sel.xpath('//div[@class="job-list"]/ul/li/a/@href').extract()
         for job_url in job_urls:
             url = url_prefix + job_url
+            time.sleep(2)
             yield scrapy.Request(url=url, callback=self.parse_job_info)
+
+        next_page_url = sel.xpath('//a[@class="next"]/href').extract()
+        if len(next_page_url) != 0:
+            next_page_url = url_prefix + ''.join(next_page_url)
+            yield scrapy.Request(url=next_page_url, callback=self.parse)
+
 
     def parse_job_info(self, response):
         sel = Selector(response)
@@ -74,7 +105,7 @@ class ZhipinSpider(scrapy.Spider):
         item['company_page'] = 'NULL'
         item['posted_date'] = ''.join(sel.xpath('//div[@class="job-author"]/span/text()').extract())
         item['posted_url'] = 'BOSS直聘'
-        item['original_link'] = response.url
+        item['original_link'] = response.url.encode('gbk', 'ignore').decode()
 
         yield item
 
