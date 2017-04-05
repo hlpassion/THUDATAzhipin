@@ -1,6 +1,10 @@
 # THUDATAzhipin
 
-爬取招聘网站信息，熟悉Scrapy框架。
+爬取招聘网站信息
 
-获取关键属性信息使用的是xpath
-不定期更新
+# 框架
+Scrapy框架。
+
+# Python版本
+Python 3.6.0
+
